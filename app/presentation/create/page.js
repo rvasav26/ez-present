@@ -23,42 +23,50 @@ import "@app/globals.css";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function Page() {
-  const [files, setFiles] = useState();
-  const handleDrop = (files) => {
+  const [audioFile, setAudioFile] = useState();
+  const [pdfFiles, setPdfFiles] = useState();
+  const handleAudioDrop = (files) => {
+    setFiles(files);
+  };
+
+  const handlePdfDrop = (files) => {
     setFiles(files);
   };
   return (
-    <div className="py-[var(--spacing-xl)] px-[var(--spacing-xxl)] min-h-screen">
-      <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+    <div className="py-[var(--spacing-xl)] px-[var(--spacing-4xl)] min-h-screen flex flex-col items-center">
+      <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-1 w-7/8">
         {" "}
         Create Presentation
       </h2>
-      <h3 className="mt-[var(--spacing-md2)] scroll-m-20 text-xl font-semibold tracking-tight">
+      <h3 className="mt-[var(--spacing-md2)] scroll-m-20 text-xl font-semibold tracking-tight w-3/4">
         Project Info
       </h3>
-      <div className="mb-[var(--spacing-md)] mt-[var(--spacing-sm)] flex !items-start flex-col gap-[var(--spacing-md)] p-[var(--spacing-sm)] border-0 shadow-none">
+      <div className="mb-[var(--spacing-md)] mt-[var(--spacing-sm)] flex !items-start flex-col gap-[var(--spacing-md)] p-[var(--spacing-sm)] border-0 shadow-none w-3/4">
         <Label className="text-lg">Name</Label>
-        <Input placeholder="Name" className="border-1 -mt-[var(--spacing-sm)]" />
+        <Input
+          placeholder="Name"
+          className="border-1 -mt-[var(--spacing-sm)] "
+        />
         <Label className="text-lg">Description</Label>
         <Textarea
-          className="border-1 -mt-[var(--spacing-sm)]"
+          className="border-1 -mt-[var(--spacing-sm)] "
           placeholder="Description"
         ></Textarea>
       </div>
 
-      <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
+      <h3 className="scroll-m-20 text-xl font-semibold tracking-tight w-3/4">
         Upload Files
       </h3>
 
-      <div className="mb-[var(--spacing-lg)] mt-[var(--spacing-md)]">
+      <div className="mb-[var(--spacing-lg)] mt-[var(--spacing-md)] gap-[var(--spacing-lg)] flex flex-col w-3/4">
         <Dropzone
           maxSize={1024 * 1024 * 10}
           accept={{ "audio/*": [".mp3", ".wav"] }}
           minSize={1024}
-          onDrop={setFiles}
+          onDrop={setAudioFile}
           onError={console.error}
-          src={files}
-          className="dropzone"
+          src={audioFile}
+          className="dropzone hover:cursor-pointer"
         >
           <DropzoneEmptyState>
             <div className="flex w-full items-center gap-4 p-8">
@@ -79,10 +87,10 @@ export default function Page() {
         <Dropzone
           maxSize={1024 * 1024 * 10}
           accept={{ "application/pdf": [".pdf"] }}
-          onDrop={setFiles}
+          onDrop={setPdfFiles}
           onError={console.error}
-          src={files}
-          className="dropzone"
+          src={pdfFiles}
+          className="dropzone hover:cursor-pointer"
         >
           <DropzoneEmptyState>
             <div className="flex w-full items-center gap-4 p-8">
@@ -101,7 +109,9 @@ export default function Page() {
         </Dropzone>
       </div>
 
-      <Button className="w-1/2 h-[var(--spacing-xl)] text-lg font-semibold mt-[var(--spacing-lg)]">Create Now</Button>
+      <Button className="w-1/4 h-[var(--spacing-xl)] text-lg font-semibold mt-[var(--spacing-lg)]">
+        Create Now
+      </Button>
     </div>
   );
 }

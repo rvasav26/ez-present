@@ -145,4 +145,8 @@
       box-shadow: none !important;
   }
 
+  .dropzone:hover {
+    cursor: pointer;
+  }
+
 }

@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <div className="test">
+    <div className="test px-[var(--spacing-3xl)]">
       {children}
     </div>
   );
