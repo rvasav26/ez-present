@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { FishAudioClient } from "fish-audio";
 import { getDb } from "@/lib/mongodb";
 import { ObjectId, GridFSBucket } from "mongodb";
+import fs from "fs";
+import path from "path";
 
 async function downloadStreamToBuf(id) {
   const db = await getDb();
@@ -43,52 +45,75 @@ async function getSlideTransitions(id) {
     );
 }
 
-export async function GET(req) {
+// export async function GET(req) {
+//   try {
+//     const db = await getDb();
+
+//     const bucket = new GridFSBucket(db, { bucketName: "audios" });
+//     const { searchParams } = new URL(req.url);
+//     const id = searchParams.get("id"); // pass ?id=<presentationId> in the download link
+
+//     if (!id) {
+//       return NextResponse.json(
+//         { error: "Missing presentation ID" },
+//         { status: 400 }
+//       );
+//     }
+
+//     const collection = db.collection("presentations");
+//     const presentation = await collection.findOne({ _id: new ObjectId(id) });
+
+//     if (!presentation) {
+//       return NextResponse.json(
+//         { error: "Presentation not found" },
+//         { status: 404 }
+//       );
+//     }
+
+//     // Fetch the audio file from the stored URL
+//     const downloadStream = bucket.openDownloadStream(presentation.audioFileId);
+//     const webStream = new ReadableStream({
+//       async start(controller) {
+//         downloadStream.on("data", (chunk) => controller.enqueue(chunk));
+//         downloadStream.on("end", () => controller.close());
+//         downloadStream.on("error", (err) => controller.error(err));
+//       },
+//     });
+
+//     await getSlideTransitions(presentation.audioFileId);
+//     // Return the file as a download
+//     return new Response(webStream, {
+//       headers: {
+//         "Content-Type": "audio/mpeg", // or "audio/mpeg" / "audio/wav" depending on format
+//         "Content-Disposition": `attachment; filename="presentation_${id}.mp3"`,
+//       },
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     return NextResponse.json({ error: err.message }, { status: 500 });
+//   }
+// }
+
+export async function GET() {
   try {
-    const db = await getDb();
+    // Hardcoded mp4 path inside /public
+    const filePath = path.join(process.cwd(), "public", "demo.mp4");
 
-    const bucket = new GridFSBucket(db, { bucketName: "audios" });
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id"); // pass ?id=<presentationId> in the download link
+    // Read into a buffer
+    const fileBuffer = fs.readFileSync(filePath);
 
-    if (!id) {
-      return NextResponse.json(
-        { error: "Missing presentation ID" },
-        { status: 400 }
-      );
-    }
-
-    const collection = db.collection("presentations");
-    const presentation = await collection.findOne({ _id: new ObjectId(id) });
-
-    if (!presentation) {
-      return NextResponse.json(
-        { error: "Presentation not found" },
-        { status: 404 }
-      );
-    }
-
-    // Fetch the audio file from the stored URL
-    const downloadStream = bucket.openDownloadStream(presentation.audioFileId);
-    const webStream = new ReadableStream({
-      async start(controller) {
-        downloadStream.on("data", (chunk) => controller.enqueue(chunk));
-        downloadStream.on("end", () => controller.close());
-        downloadStream.on("error", (err) => controller.error(err));
-      },
-    });
-
-    await getSlideTransitions(presentation.audioFileId);
-    // Return the file as a download
-    return new Response(webStream, {
+    return new Response(fileBuffer, {
       headers: {
-        "Content-Type": "audio/mpeg", // or "audio/mpeg" / "audio/wav" depending on format
-        "Content-Disposition": `attachment; filename="presentation_${id}.mp3"`,
+        "Content-Type": "video/mp4",
+        "Content-Disposition": 'attachment; filename="presentation.mp4"',
       },
     });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("Download error:", err);
+    return NextResponse.json(
+      { error: "Failed to download file" },
+      { status: 500 }
+    );
   }
 }
 
